@@ -1,5 +1,6 @@
-# Tao's work around Azure Policy
+# Azure Policy collection
 
-This repository contains sample Azure Policy I shared on my blog [https://blog.tyang.org/](https://blog.tyang.org/).
+Fork from *Tao's work around Azure Policy*
 
-Feel free to submit PR if you see any issues or potential update.
+This repository contains sample Azure Policy shared on the blog [https://blog.tyang.org/](https://blog.tyang.org/).
+

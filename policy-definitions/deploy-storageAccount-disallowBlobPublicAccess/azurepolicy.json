@@ -1,0 +1,94 @@
+{
+    "type": "Microsoft.Authorization/policyDefinitions",
+    "name": "deploy-disallowBlobPublicAccess-policyDef",
+    "properties": {
+        "displayName": "Disable allowPublicAccess on Storage Account",
+        "mode": "All",
+        "description": "Disable allowPublicAccess on Storage Account",
+        "parameters": {
+            "allowBlobPublicAccess": {
+                "type": "string",
+                "defaultValue": "false"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Storage/storageAccounts"
+                    },
+                    {
+                        "anyOf": [
+                            {
+                                "field": "Microsoft.Storage/storageAccounts/allowBlobPublicAccess",
+                                "equals": ""
+                            },
+                            {
+                                "field": "Microsoft.Storage/storageAccounts/allowBlobPublicAccess",
+                                "equals": "true"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "then": {
+                "effect": "deployIfNotExists",
+                "details": {
+                    "type": "Microsoft.Storage/storageAccounts",
+                    "name": "[field('name')]",
+                    "existenceCondition": {
+                        "field": "Microsoft.Storage/storageAccounts/allowBlobPublicAccess",
+                        "equals": "false"
+                    },
+                    "roleDefinitionIds": [
+                        "/providers/microsoft.authorization/roleDefinitions/17d1049b-9a84-46fb-8f53-869881c3d3ab"
+                    ],
+                    "deployment": {
+                        "properties": {
+                            "mode": "incremental",
+                            "template": {
+                                "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                "contentVersion": "1.0.0.0",
+                                "parameters": {
+                                    "allowBlobPublicAccess": {
+                                        "type": "string"
+                                    },
+                                    "storageAccountName": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    }
+                                },
+                                "resources": [
+                                    {
+                                        "type": "Microsoft.Storage/storageAccounts",
+                                        "apiVersion": "2019-06-01",
+                                        "name": "[parameters('storageAccountName')]",
+                                        "location": "[parameters('location')]",
+                                        "dependsOn": [],
+                                        "properties": {
+                                            "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]"
+                                        }
+                                    }
+                                ]
+                            },
+                            "parameters": {
+                                "location": {
+                                    "value": "[field('location')]"
+                                },
+                                "storageAccountName": {
+                                    "value": "[field('name')]"
+                                },
+                                "allowBlobPublicAccess": {
+                                    "value": "[parameters('allowBlobPublicAccess')]"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
